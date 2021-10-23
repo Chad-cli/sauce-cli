@@ -1,0 +1,141 @@
+#!/bin/sh
+
+#deps-----------------
+
+# feh
+# wget
+# parallel
+
+#colors/extras--------
+
+bold="\e[1m"
+underline="\e[4m"
+
+BLACK="\e[40m"
+RED="\e[41m"
+GREEN="\e[42m"
+ORANGE="\e[43m"
+BLUE="\e[44m"
+AQUA="\e[106m"
+WHITE="\e[107m"
+
+black="\e[30m"
+red="\e[31m"
+green="\e[32m"
+orange="\e[33m"
+blue="\e[34m"
+white="\e[97m"
+aqua="\e[96m"
+darkgray="\e[90m"
+gray="\e[37m"
+yellow="\e[93m"
+end="\e[0m"
+X="${bold}${BLACK}${red} >${green}>${blue}> "
+Y=" ${bold}${BLACK}${red} <${green}<${blue}< ${end}\\n"
+HELP="${bold}${BLACK}${red} >${green}>${blue}> ${WHITE}${black}  use -h for help   ${BLACK}${red} <${green}<${blue}< ${end}\\n"
+SAUCE="${X}${WHITE}${black}  sauce-finder     ${Y}"
+No_results_found="${X}${BLACK}${red}  No results found ${Y}"
+
+function No_results_found
+{
+    echo -en "${No_results_found}"
+    exit 1;
+}
+
+function help_main 
+{
+    echo -en "${SAUCE}\\n"
+    echo -en "${BOLD}${yellow} > required dependencies${end}\\n"
+    echo -en "${BOLD}${RED}${black} > feh      ${end}\\n"
+    echo -en "${BOLD}${GREEN}${black} > wget     ${end}\\n"
+    echo -en "${BOLD}${AQUA}${black} > parallel ${end}\\n\\n"    
+    echo -en "${bold}Usage${end}\\n"
+    echo -en "${green}"$ ./sauce" ${blue}<sauce code>${end}\\n\\n"
+    echo -en "This will download all the files in /tmp/<code>/<code> and \\nthen open all files in sorted order in feh image viewer\\n\\n"
+    echo -en "${BOLD}${AQUA}${black} >> feh key Bindings ${end}\\n"
+    echo "<Up>              zoom in "
+    echo "<Down>            zoom out "
+    echo "<Right>           next page "
+    echo "<Left>            previous page "
+    echo "<ctrl + Up>       scroll up "
+    echo "<ctrl + Down>     scroll down"
+    echo "<ctrl + Right>    scroll rigth"
+    echo "<ctrl + Left>     scroll left"
+    echo "<d>               page info"
+    exit 0;
+}
+
+function help_str
+{
+    echo -en "${HELP}"
+    exit 1;
+}
+
+function check
+{
+    expr  0 + ${1:-} &>/dev/null || help_str;
+}
+
+function preview
+{
+    echo -en "${X}${BLUE}${black}  Do you want to open all images in feh                  ${BLACK}${white}(${red}*${green}/${blue}n${white})\e[0m"
+    read choice
+    if [ "${choice}" == "n" ]
+    then
+        echo -en "${bold}${X}\e[45m${black}  Use following command to browse all the files          ${Y}"
+        echo -en "${bold}${X}${white}  $ ${BLACK}${green}feh -F --version-sort --sort name /tmp/$1/$1${Y}"
+    elif [ "${choice}" == "N" ]
+    then
+        echo -en "${bold}${X}\e[45m${black}  Use following command to browse all the files          ${Y}"
+        echo -en "${bold}${X}${white}  $ ${BLACK}${green}feh -F --version-sort --sort name /tmp/$1/$1${Y}"
+    else
+        echo -en "${X}${AQUA}${black}  Currently playing ${1}    [total pages($(cat /tmp/$1/$1/temp | wc -l))]         ${Y}"
+        feh -F --version-sort --sort name /tmp/$1/$1 &
+    fi
+}
+
+while getopts ':h' opt;
+do
+    case $opt in
+            h) help_main;;
+            \?) echo -en "${HELP}" ; exit 1;;
+    esac
+done
+
+check $@
+
+echo -en "${SAUCE}"
+rm -rf /tmp/$1 ; mkdir -p /tmp/$1/$1
+echo -en "${X}${RED}${black}  Creating temporary directory /tmp/${1}/${1}       ${Y}"
+
+wget -qc https://nhentai.net/g/$1/ -P /tmp/$1/  > /dev/null 2>&1 || No_results_found
+echo "$(cat /tmp/$1/index.html | tr '/' '\n' | tr '"' '\n'  | grep t.jpg | cut -d 't' -f1 | uniq )" >> /tmp/$1/temp
+rm /tmp/$1/index.html
+
+echo -en "${X}${GREEN}${black}  Getting data for sauce [${1}]...............        ${Y}"
+
+wget -qc https://nhentai.net/g/$1/1/ -P /tmp/$1/   > /dev/null 2>&1
+
+f=$(cat /tmp/$1/index.html | tr '"' '\n' | grep jpg | cut -d '/' -f5)
+rm /tmp/$1/index.html
+
+for i in $(cat /tmp/$1/temp);
+    do
+            echo "https://i.nhentai.net/galleries/${f}/${i}.jpg" >> /tmp/$1/$1/temp
+    done
+
+echo -en "${X}${ORANGE}${black}  Downloading files..............   [Total files ($(cat /tmp/$1/$1/temp | wc -l))]  ${Y}"
+
+cat /tmp/$1/$1/temp | parallel -j 32 wget -qP /tmp/$1/$1/   > /dev/null 2>&1
+
+
+preview $1
+
+rm /tmp/$1/temp
+rm /tmp/$1/$1/temp
+
+echo -en "${HELP}"
+
+exit 0;
+
+
