@@ -2,8 +2,8 @@
 
 #+OPTIONS: ^:{}
 
-* Sauce-Finder
-sauce-finder is a CLI tool for downloading explicit comics from [[http://nhentai.net][nhentai]]
+* Sauce-cli
+sauce-cli is a CLI tool for downloading explicit comics from [[http://nhentai.net][nhentai]]
 
 [[./assets/ss.gif]]
 [[./assets/screenshot.jpg]]
@@ -21,8 +21,8 @@ All art assets used are for demonstration and educational purposes. All rights a
 
 * Usage
 #+BEGIN_SRC sh
-git clone https://github.com/Shubham-Vy/sauce-finder.git
-cd sauce-finder
+git clone https://github.com/Chad-cli/sauce-cli.git
+cd sauce-cli
 cd sauce
 ./sauce -h
 #+END_SRC
