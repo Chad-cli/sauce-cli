@@ -1,0 +1,28 @@
+#+TITLE: Readme
+
+#+OPTIONS: ^:{}
+
+* Sauce-Finder
+sauce-finder is a CLI tool for downloading explicit comics from [[http://nhentai.net][nhentai]]
+
+[[./assets/ss.gif]]
+[[./assets/screenshot.jpg]]
+
+** Disclaimer
+
+All art assets used are for demonstration and educational purposes. All rights are reserved to their original owners. If you (as a person or a company) own the art and do not wish it to be associated with this project, please contact us at shubhamvyas1691@gmail.com and we will gladly take it down.
+
+
+* Required Dependencies
+| *Dependencies* |
+| [[https://www.gnu.org/software/wget/][wget]]           |
+| [[https://feh.finalrewind.org/][feh]]            |
+| [[https://www.gnu.org/software/parallel/][parallel]]       |
+
+* Usage
+#+BEGIN_SRC sh
+git clone https://github.com/Shubham-Vy/sauce-finder.git
+cd sauce-finder
+cd sauce
+./sauce -h
+#+END_SRC
